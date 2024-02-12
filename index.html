@@ -1,0 +1,107 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form to URL</title>
+    <style>
+        body {
+            margin: 1rem;
+        }
+        div, h1 {
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Automatically Save Form Data to the URL</h1>
+    <form action="">
+        <div>
+            <label>
+                <span>Text Input</span>
+                <input type="text" value="" name="text1">
+            </label>
+        </div>
+        <div>
+            <label>
+                <span>Textarea</span>
+                <textarea name="textarea1"></textarea>
+            </label>
+        </div>
+        <div>
+            <label><input type="radio" name="radio1" value="optiona"> radio a</label>
+            <label><input type="radio" name="radio1" value="optionb"> radio b</label>
+        </div>
+        <div>
+            <label><input type="checkbox" name="checkbox1" > checkbox</label>
+        </div>
+        <div>
+            <label>
+                <span>Select</span>
+                <select name="select1">
+                    <option value="value1">Value 1</option>
+                    <option value="value2">Value 2</option>
+                </select>
+            </label>
+        </div>
+        <div>
+            <!-- Copy URL Feature: HTML  -->
+            <button type="button" onclick="copyURL()">copy URL to clipboard</button>
+            <span id="copyText"></span>
+        </div>
+    </form>
+    <script>
+
+        // Initial variables
+        const urlBase = window.location.protocol  + "//" + window.location.host + window.location.pathname  + "?";
+        const form = document.querySelector('form');
+        var formDataString;
+
+        // Functions
+        var updateFormFromURL = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.forEach((value, key) => {
+                var input = document.querySelector('[name="'+key+'"]');
+                var inputType = input.type;
+                if(inputType == 'checkbox') {
+                    if(value == 'on') {
+
+                        input.checked = true;
+                    }
+                }
+                else if(inputType == 'radio') {
+                    document.querySelector('[name="'+key+'"][value="'+value+'"]').checked = true;
+                }
+                else {
+                    document.querySelector('[name="'+key+'"]').value = value;
+                }
+            });
+        }
+
+        var updateURLFromForm = function(event) {
+            formDataString = new URLSearchParams(new FormData(form)).toString();
+            window.history.replaceState( {} , 'test', urlBase + formDataString);
+        }
+
+        
+
+        // triggering previously defined functions...
+        updateFormFromURL();
+        form.addEventListener("keyup", updateURLFromForm, false);
+        form.addEventListener("change", updateURLFromForm, false);
+
+        // Copy URL Feature: Javascript
+        const copyTextElement = document.getElementById('copyText');
+        var copyURL = function() {
+            let url = document.location.href
+
+            navigator.clipboard.writeText(url).then(function() {
+                copyTextElement.innerHTML = 'Copied!';
+            }, function() {
+                copyTextElement.innerHTML = 'Error';
+            });
+            setTimeout(function(){copyTextElement.innerHTML = '';}, 1000);
+        }
+
+    </script>
+</body>
+</html>
